@@ -99,6 +99,236 @@ for tc in range(1, T+1):
 
 
 
+- **swea_1961(숫자 배열 회전)**
+
+N x N 행렬이 주어질 때,
+
+시계 방향으로 90도, 180도, 270도 회전한 모양을 출력하는 문제.
+
+나는 행 순서가 아니라 열 순서대로 숫자들을 거꾸로 새로운 리스트에 담는 방법을 사용했다.
+
+
+
+만일 N이 3이라면,
+
+new_arr = [ 
+
+[arr[2] [0], arr[1] [0], arr[0] [0]], 
+
+[arr[2] [1], arr[1] [1], arr[0] [1]], 
+
+[arr[2] [2], arr[1] [2], arr[0] [2]]
+
+]
+
+
+
+이렇게 일일이 하니 시간이 너무 오래 걸렸고 코드가 엄청 길어졌다..
+
+코드를 줄이는 방법을 다시 생각해야겠다,,
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    N = int(input())
+    arr = [list(map(int, input().split())) for _ in range(N)]
+
+    new_lst = []
+    for i in range(0, len(arr)):
+        lst = []
+        for j in range(0, len(arr)):
+            lst.append(arr[j][i])
+            
+        new_lst.append(lst)
+        
+    num_list = []
+    for i in new_lst:
+        num_list.append(i[::-1])
+
+    new_lst2 = []
+    for k in range(0, N):
+        lst2 = []
+        for l in range(0, N):
+            lst2.append(num_list[l][k])
+        new_lst2.append(lst2)
+
+    num_list2 = []
+    for i in new_lst2:
+        num_list2.append(i[::-1])
+        num_list.append(i[::-1])
+
+    new_lst3 = []
+    for k in range(0, N):
+        lst3 = []
+        for l in range(0, N):
+            lst3.append(num_list2[l][k])
+        new_lst3.append(lst3)
+
+    num_list3 = []
+    for i in new_lst3:
+        num_list3.append(i[::-1])
+        num_list.append(i[::-1])
+
+    print('#{}'.format(tc))
+    for i in range(0, N):
+        for j in num_list[i:len(num_list):N]:
+            j.append(" ")
+            for k in j:
+                print(k, end='')
+        print()
+```
+
+
+
+- **swea_1979(어디에 단어가 들어갈 수 있을까)**
+
+처음엔 행과 열 모두 체크하면서 연속된 1의 값을 cnt로 체크해주고 cnt가 K-1번 나왔다면 result에 +1을 해주자! 라고 생각하고 코드를 짰다.
+
+```python
+N, K = map(int, input().split())
+arr = [list(map(int, input().split())) for _ in range(N)]
+
+result = 0
+# 행 체크
+for i in range(0, N):
+    cnt = 0
+    for j in range(0, N-1):
+        if arr[i][j] == 0:
+            continue
+        else:
+            if arr[i][j] == arr[i][j+1]:
+                cnt += 1
+if cnt == K-1:
+    result += 1
+# 열 체크
+for i in range(0, N-1):
+    cnt1 = 0
+    for j in range(0, N):
+        if arr[j][i] == 0:
+            continue
+        if arr[j][i] == arr[j][i+1]:
+            cnt1 += 1
+if cnt1 == K-1:
+    result += 1
+print(result)
+```
+
+여기서 가장 쉽게 발견할 수 있었던 오류는 cnt와 K-1의 if문의 들여쓰기 였다.
+
+그래서 일일이 if문 들여쓰기를 해보았다.
+
+
+
+```python
+N, K = map(int, input().split())
+arr = [list(map(int, input().split())) for _ in range(N)]
+
+result = 0
+
+for i in range(0, N):
+    cnt = 0
+    for j in range(0, N-1):
+        if arr[i][j] == 0:
+            cnt = 0
+            continue
+        if arr[i][j] == arr[i][j+1]:
+            cnt += 1
+    if cnt == K-1:
+    	result += 1
+                
+for i in range(0, N-1):
+    cnt1 = 0
+    for j in range(0, N):
+        if arr[j][i] == 0:
+            cnt1 = 0
+            continue         
+        if arr[j][i] == arr[j][i+1]:
+            cnt1 += 1
+    if cnt1 == K-1:
+    	result += 1
+
+print(result)
+```
+
+연속된 값으로 찾으려고 했는데 답이 안나와서 그냥 요소가 1인것들을 세기로 했다.
+
+```python
+N, K = map(int, input().split())
+arr = [list(map(int, input().split())) for _ in range(N)]
+
+result = 0
+for i in range(0, N):
+    cnt = 0
+    for j in range(0, N):
+        if arr[i][j] == 0:
+            cnt = 0
+            continue
+        if arr[i][j] == 1:
+            cnt += 1
+    if cnt == K:
+        result += 1    
+
+for i in range(0, N):
+	cnt1 = 0
+	for j in range(0, N):
+		if arr[j][i] == 0:
+			cnt1 = 0
+			continue
+		if arr[j][i] == 1:
+			cnt1 += 1
+	if cnt1 == K:
+		result += 1
+```
+
+이렇게 하면 행 또는 열 안에 1이 연속되게 K번 나온 후 0이 나온다면 cnt를 0으로 초기화했기 때문에 값이 나오지 않았다. 그래서 요소가 0일 때도 cnt가 K와 같은지 확인해야 한다!
+
+> 최종코드
+
+```python
+import sys
+sys.stdin = open('input_1979.txt')
+
+T = int(input())
+for tc in range(1, T+1):
+
+    N, K = map(int, input().split())
+    arr = [list(map(int, input().split())) for _ in range(N)]
+
+    result = 0
+    # cnt = 0
+    for i in range(0, N):
+        cnt = 0
+        for j in range(0, N):
+            if arr[i][j] == 0:
+                if cnt == K:
+                    result += 1
+                cnt = 0
+                continue
+            else:
+                cnt += 1
+        if cnt == K:
+            result += 1
+
+    for i in range(0, N):
+        cnt = 0
+        for j in range(0, N):
+            if arr[j][i] == 0:
+                if cnt == K:
+                    result += 1
+                cnt = 0
+                continue
+            else:
+                cnt += 1
+        if cnt == K:
+            result += 1
+
+    print('#{} {}'.format(tc, result))
+```
+
+
+
+
+
 ### D3
 
 
