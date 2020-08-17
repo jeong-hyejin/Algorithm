@@ -99,7 +99,7 @@ for tc in range(1, T+1):
 
 
 
-- **swea_1961(숫자 배열 회전)**
+- **swea_1961 (숫자 배열 회전)**
 
 N x N 행렬이 주어질 때,
 
@@ -180,7 +180,7 @@ for tc in range(1, T+1):
 
 
 
-- **swea_1979(어디에 단어가 들어갈 수 있을까)**
+- **swea_1979 (어디에 단어가 들어갈 수 있을까)**
 
 처음엔 행과 열 모두 체크하면서 연속된 1의 값을 cnt로 체크해주고 cnt가 K-1번 나왔다면 result에 +1을 해주자! 라고 생각하고 코드를 짰다.
 
@@ -326,6 +326,131 @@ for tc in range(1, T+1):
 ```
 
 
+
+- **swea_1976 (시각 덧셈)**
+
+시 분으로 이루어진 시각을 2개 입력 받아, 더한 값을 시 분으로 출력하는 문제.
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+
+    lst = list(map(int, input().split()))
+
+	# 시 끼리 먼저 더해주고 더한 값이 12보다 크면 값에서 12를 빼준다.
+    if lst[0] + lst[2] > 12:
+        h = (lst[0] + lst[2]) - 12
+
+    else:
+        h = lst[0] + lst[2]
+	# 분 끼리 더해주고 더한 값이 60보다 크면 값에서 60을 빼주고 시에 + 1를 해준다.
+    if lst[1] + lst[3] > 60:
+        h += 1
+        m = (lst[1] + lst[3]) - 60
+
+    else:
+        m = lst[1] + lst[3]
+
+    print('#{} {} {}'.format(tc,h, m))
+```
+
+
+
+- **swea_1954 (달팽이 숫자)**
+
+1부터 N*N 까지의 숫자를 시계방향으로 이루어진 달팽이 모양으로 출력하는 문제.
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+
+    # lst에서 최소값을 구한다.
+    def getMin(curV):
+        minV = 1000
+        for i in lst:
+            if minV > i and i > curV:
+                minV = i
+        return minV
+
+    # 벽을 만났을 때,
+    def isWall(x, y):
+        if x >= N or x < 0:
+            return True
+        if y >= N or y < 0:
+            return True
+        if arr[y][x] != 0:
+            return True
+        return False
+
+    N = int(input())
+    lst = list(range(1, N**2+1))
+    arr = [[0] * N for _ in range(N)]
+    
+	# 방향 설정
+    dx = [1, 0, -1, 0]
+    dy = [0, 1, 0, -1]
+    dir = 0
+
+    # 현재 위치 설정
+    curX = curY = 0
+    curV = 0
+	
+    for i in range(1, N**2+1):
+        val = getMin(curV)
+        arr[curY][curX] = val
+        testX = curX + dx[dir]
+        testY = curY + dy[dir]
+        if isWall(testX, testY):
+            dir += 1
+            if dir == 4:
+                dir = 0
+
+        curX = curX + dx[dir]
+        curY = curY + dy[dir]
+        curV = val
+
+    print('#{}'.format(tc))
+    for i in range(len(arr)):
+        for j in range(len(arr)):
+            print(arr[i][j], end=" ")
+        print()
+```
+
+
+
+- **swea_2005 (파스칼의 삼각형)**
+
+![swea_2005](README.assets/swea_2005.PNG)
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    
+    N = int(input())
+    # N행의 빈 2차원 리스트를 만들어준다.
+    arr = [ [] for _ in range(N)]
+
+    # 1행은 [1] 2행은 [1, 1]을 먼저 넣어준다.
+    arr[0].append(1)
+    if len(arr) > 1:
+        arr[1].append(1)
+        arr[1].append(1)
+
+	# 2행부터 순회하며 연속된 두개의 값을 더해 그 다음 행에 넣어주고,
+    for i in range(1, N-1):
+        for j in range(0, len(arr[i])-1):
+            x = arr[i][j] + arr[i][j+1]
+            arr[i+1].append(x)
+        # 행의 앞, 뒤로 1를 넣어준다.
+        arr[i+1].insert(0, 1)
+        arr[i+1].insert(len(arr[i+1]), 1)
+
+    print('#{}'.format(tc))
+    for i in range(N):
+        for j in range(0, len(arr[i])):
+            print(arr[i][j], end=" ")
+        print()
+```
 
 
 
