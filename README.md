@@ -454,6 +454,29 @@ for tc in range(1, T+1):
 
 
 
+- **swea_1970 (쉬운 거스름돈)**
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+    N = int(input())
+    lst = [50000, 10000, 5000, 1000, 500, 100, 50, 10]
+
+    print('#{}'.format(tc))
+    cnt = 0
+    for i in lst:
+        cnt = N // i
+        print(cnt,end=" ")
+        N = N - (i*cnt)
+    print()
+```
+
+
+
+- **swea_1926 (간단한 369게임)**
+
+
+
 ### D3
 
 
@@ -468,11 +491,216 @@ for tc in range(1, T+1):
 
 ### 이론
 
+> string
 
+- **문자열 뒤집기 (연습문제 1)**
+
+  python은 reverse함수 혹은 silce notation을 이용하여 구현하면 된다.
+
+  string은 immutable이기 때문에 swap이 가능하지 않다.
+
+  그렇기때문에 string을 list로 변환해주어야 한다!
+
+  ```python
+  def word_reverse(word):
+      # str -> list
+      arr = list(word)
+      # swap
+      for i in range(len(arr)//2):
+         arr[i], arr[len(arr)-1-i] = arr[len(arr)-1-i], arr[i]
+      # list -> str
+      word = "".join(arr)
+      return word
+  
+  
+  word = 'algorithm'
+  word1 = word_reverse(word)
+  print(word1)
+  ```
+
+  ```python
+  # [::-1] 이용
+  word = 'algorithm'
+  print(word[::-1])
+  ```
+
+  ```python
+  # reverse() 이용
+  word = 'algorithm'
+  arr = list(word)
+  arr.reverse()
+  arr = "".join(arr)
+  print(arr)
+  ```
+
+
+
+- **문자열 비교 (string compare)**
+
+```python
+def strcmp(s1, s2):
+    if len(s1) != len(s2):
+        return False
+    else:
+        i = 0 # 초기식
+        while i < len(s1) and i < len(s2): # 조건식
+            if s1[i] != s2[i]:
+                return False
+            i += 1 # 증감식
+        return True
+
+a = 'abc'
+b = 'abc'
+print(strcmp(a, b)) # True, False
+```
+
+
+
+- **문자열 숫자를 정수로 변환 ( atoi() )** 
+
+```python
+def atoi(word):
+    value = 0
+    for i in range(len(word)):
+        c = word[i]
+        # 0 ~ 9
+        # if c >= '0' and c <= '9':
+        if '0' <= c <= '9':
+            # ord(c) = 49, ord('o') = 48
+            digit = ord(c) - ord('0')
+        else:
+            break
+            # value = 0 * 10 + 1 -> 1
+            # value = 1 * 10 + 2 -> 12
+            # value = 12 * 10 + 3 -> 123
+        value = value * 10 + digit
+    return value
+
+a = '123'
+print(type(a))
+b = atoi(a)
+print(type(b))
+```
+
+
+
+- **정수를 문자열로 변환 ( itoa() )** 
+
+```python
+def itoa(num):
+    x = num # 몫
+    y = 0  # 나머지가 들어갈 변수
+    arr = []
+    while x:
+        y = x % 10
+        x = x // 10
+        # arr = [3, 2, 1]
+        arr.append(chr(y + ord('0')))
+    # arr = [1, 2, 3]
+    arr.reverse()
+    # list -> str로 변환
+    str = ''.join(arr)
+    return str
+
+x = 123
+print(x, type(x))
+str = itoa(x)
+print(str, type(str))
+```
+
+
+
+- **패턴매칭**
+
+  - 고직식한 알고리즘(Brute Force): 본문 문자열을 처음부터 끝까지 차례대로 순회하면서 패턴 내의 문자들을 일일이 비교하는 방식으로 동작
+
+  ```python
+  def BruteForce(p, t):
+      i = 0
+      j = 0
+      while j < M and i < N:
+          if t[i] != p[j]:
+              i = i - j
+              j = -1
+          i = i + 1
+          j = j + 1
+      if j == M:
+          return i - M
+      else:
+          return -1
+  
+  p = 'is'
+  t = 'This is a book~!'
+  M = len(p)
+  N = len(t)
+  print(BruteForce(p, t))
+  ```
+
+  
+
+  
 
 ### Intermediate
 
+- **[S/W 문제해결 기본] 5일차 - GNS**
 
+  ```python
+  T = int(input())
+  for tc in range(1, T+1):
+      print('#{}'.format(tc))
+      N = input() # 실제 사용은 하지 않는다.
+      word = input().split()
+      word_list = ["ZRO", "ONE", "TWO", "THR", "FOR", "FIV", "SIX", "SVN", "EGT", "NIN"]
+  
+      # word_list의 값들이 0~9의 값을 가지도록 딕셔너리 형태로 만들어준다.
+      # {'ZRO': 0, 'ONE': 1, 'TWO': 2, 'THR': 3, 'FOR': 4, 'FIV': 5, 'SIX': 6, 'SVN': 7, 'EGT': 8, 'NIN': 9}
+      result = {}
+      cnt = 0
+      for i in word_list:
+          if i == "ZRO":
+              cnt = 0
+          else:
+              cnt += 1
+          result[i] = cnt
+  
+      # input값을 오름차순으로 정렬시키기 위해 .get()을 이용하여 value값만 담은 리스트를 만들었다.
+      new = []
+      for i in word:
+          new.append(result.get(i))
+          new = sorted(new)
+  
+      # 정렬된 value값들을 순회하면서,
+      # result의 value값과 같다면 key를 출력하도록 하였다.
+      key_lst = []
+      for num in new:
+          for key, value in result.items():
+              if value == num:
+                  key_lst.append(key)
+  
+      for i in key_lst:
+          print(i, end=" ")
+      print()
+  ```
+
+  #
+
+  ```python
+  arr = ["ZRO", "ONE", "TWO", "THR", "FOR", "FIV", "SIX", "SVN", "EGT", "NIN"]
+  T = int(input())
+  for tc in range(1, T+1):
+      print('#{}'.format(tc))
+      No, N = input().split()
+      s = input().split()
+      # 1번째 방법
+      # arr을 순회하면서 값이 s에 있으면 출력하면 된다.
+      for chk in arr:
+          for j in s:
+              if chk == j:
+                  print(j, end=" ")
+      print()
+  ```
+
+  
 
 ### Advanced
 
