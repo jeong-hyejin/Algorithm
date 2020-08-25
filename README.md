@@ -491,7 +491,7 @@ for tc in range(1, T+1):
 
 ### 이론
 
-> string
+> **string**
 
 - **문자열 뒤집기 (연습문제 1)**
 
@@ -700,11 +700,229 @@ print(str, type(str))
       print()
   ```
 
+  #
   
+  ```python
+  arr = ["ZRO", "ONE", "TWO", "THR", "FOR", "FIV", "SIX", "SVN", "EGT", "NIN"]
+  T = int(input())
+  for tc in range(1, T+1):
+      print('#{}'.format(tc))
+      No, N = input().split()
+      s = input().split()
+      # 2번째 방법
+      # arr을 순회하면서 s에 몇개있는지 count를 센 후, count만큼 출력한다.
+      for i in arr:
+          print((i+' ')*s.count(i), end=" ")
+  ```
+
+
+
+- **[S/W 문제해결 기본] 3일차 - 회문**
+
+```python
+'''
+100 * 100 table에서 행과 열에서 가장 긴 회문을 찾고 회문의 길이를 출력하는 문제.
+회문의 길이가 정해져있지않아 1개부터 100개가지 반복을 돌며 회문을 찾고,
+딕셔너리에 key에는 회문을 value에는 회문의 길이를 넣어
+value값만 순회하며 최댓값을 찾아냈다.
+'''
+
+T = 10
+for tc in range(1, T+1):
+    print('#{}'.format(tc), end=" ")
+
+    number = int(input())
+    arr = list(input() for _ in range(100))
+    # 회문과 회문의 길이를 담을 딕셔너리를 만든다.
+    result = {}
+
+    # 행 탐색
+    # 100 * 100 table이기 때문에 범위를 100으로 주면서 완전탐색한다.
+    for i in range(100):
+        for j in range(100):
+            # 회문의 길이가 1부터 100까지 가능하기때문에 슬라이싱 범위에 사용될 k를 2~101까지 반복을 돌린다.
+            for k in range(2, 102):
+                # i = 0, j = 0, k = 2라면,
+                # arr[0][0:2]까지 슬라이싱한 후 회문인지 판단한다.(k=2 -> 회문의 길이 == 1)
+                if arr[i][j:j+k] == arr[i][j:j+k][::-1]:
+                    # 회문이라면, 회문의 길이를 구하고
+                    length = len(arr[i][j:j+k])
+                    # result에 key=회문, value=회문 길이로 넣어준다.
+                    result[arr[i][j:j+k]] = length
+    # 열 탐색
+    # 열은 슬라이싱을 사용할 수 없다.
+    # 그러므로 열 값을 따로 담은 리스트를 새로 만들자.
+
+    # 2차원 리스트 변수를 만든다.
+    column = []
+    # 완전탐색으로 열을 c_lst에 담는다.
+    for i in range(100):
+        c_lst = []
+        for j in range(100):
+            c_lst.append(arr[j][i])
+        # c_lst를 column리스트에 담아준다.
+        # [ [""], [""], [""].... ]
+        column.append(c_lst)
+    
+    # 행과 같은 방법으로 회문을 찾는다.
+    for i in range(100):
+        for j in range(100):
+            for k in range(2, 102):
+                if column[i][j:j+k] == column[i][j:j+k][::-1]:
+                    length = len(column[i][j:j+k])
+                    result["".join(column[i][j:j+k])] = length
+    # result의 value 값을 순회하면서 초댓값을 찾아준다.
+    max_value = 0
+    for key, value in result.items():
+        if max_value < value:
+            max_value = value
+    # 최댓값을 출력한다.
+    print(max_value)
+```
+
+
+
+- **swea_4861 (회문)**
+
+```python
+'''
+N * N table에서 길이가 M인 회문을 찾는 문제
+여기서 주의할 점은 N과 M이 같지않을때,
+만약 10 * 10 table에서 길이가 5인 회문이라면
+['ABCDEFGHIJ']에서 시작점의 범위는 'A'~'F'까지만 확인하면 된다.!
+-> 범위를 N-M+1로 주어야 한다.!
+'''
+T = int(input())
+for tc in range(1, T+1):
+    print('#{}'.format(tc), end=" ")
+    N, M = map(int, input().split())
+    arr = list(input() for _ in range(N))
+
+    # 행 체크
+    for i in range(N):
+        for j in range(N-M+1):
+            # 회문 길이만큼 슬라이싱해서 [::-1]과 같다면,
+            if arr[i][j:j+M] == arr[i][j:j+M][::-1]:
+                # 출력한다.
+                print(arr[i][j:j+M])
+    # 열 체크
+    # 열 체크를 할 땐 슬라이싱을 사용할 수 없다.
+    # 열을 그냥 새로운 리스트에 담아서 위와 같은 방법을 사용하자.
+
+    # 2차원 배열을 담을 리스트를 만든다.
+    colunm = []
+    # 완전탐색을 이용하여 열 값을 lst리스트에 담아준다.
+    for i in range(N):
+        lst = []
+        for j in range(N):
+            lst.append(arr[j][i])
+        # [ [""], [""], [""].... ]
+        colunm.append(lst)
+
+    # 행 체크 방법과 동일하게 적용한다.
+    for i in range(N):
+        for j in range(N-M+1):
+            if colunm[i][j:j+M] == colunm[i][j:j+M][::-1]:
+                # 리스트이기때문에 str로 변환해서 출력해야 한다!
+                print("".join(colunm[i][j:j+M]))
+```
+
+
+
+- **swea_4864 (문자열 비교)**
+
+```python
+T = int(input())
+for tc in range(1, T+1):
+
+    def BruteForce(p, t):
+        i = 0
+        j = 0
+        while j < M and i < N:
+            if str2[i] != str1[j]:
+                i = i - j
+                j = -1
+
+            i = i + 1
+            j = j + 1
+        if j == M:
+            return 1
+        else:
+            return 0
+
+    str1 = input()
+    str2 = input()
+    M = len(str1)
+    N = len(str2)
+    print('#{} {}'.format(tc, BruteForce(str1, str2)))
+```
+
+
+
+#
+
+```python
+P = input()
+T = input()
+# pp하고 tp 초기화
+pp = 0
+tp = 0
+found = False # while 빠져나갈 때
+# while 못찾은 동안 and tp가 범위내에 있는 경우:
+while not found and tp < len(P)-len(T) + 1:
+    if P[pp] == T[tp]:
+        pp += 1
+        tp += 1
+        if pp == len(P):
+        # if  pp가 마지막에 오면:
+            found = True # 찾음
+    else:
+        pp = 0
+        tp = tp - pp + 1
+
+if found==True:
+    print('1')
+else:
+    print('0')
+```
+
+
+
+- **swea_4865 (글자수)**
+
+```python
+T = int(input())
+for tc in  range(1, T+1):
+    str1 = input()
+    str2 = input()
+
+    # str1이 str2에 몇개씩 들어가있는지 확인하기위해 딕셔너리를 사용한다.
+    result = {}
+    # str1의 문자를 key로 만들고 str2에 나온 횟수를 value로 만든다.
+    # str1의 key를 순회하면서,
+    for i in str1:
+        cnt = 0
+        # str2를 순회하면서 key를 비교한다.
+        for j in str2:
+        # str2의 key값과 같다면(str1의 key가 str2에 들어있다면)
+            if i == j:
+                # key에 해당하는 value값을 1씩 증가시킨다.
+                cnt += 1
+                # result 넣어준다.
+                result[i] = cnt
+    # 최댓값을 초기화시켜놓고,
+    max_value = 0
+    # result의 value 값들만 순회하면서
+    for i in result.values():
+        # 최댓값을 구해준다.
+        if i > max_value:
+            max_value = i
+    # value의 최댓값을 출력한다.
+    print('#{} {}'.format(tc, max_value))
+```
+
+
+
+
 
 ### Advanced
-
-
-
-
-
