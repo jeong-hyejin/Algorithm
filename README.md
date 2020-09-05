@@ -477,9 +477,156 @@ for tc in range(1, T+1):
 
 
 
+- **swea_1954 (달팽이 숫자)**
+
+```python
+# 벽인지 체크
+def isWall(x, y):
+    if x < 0 or x >= N:
+        return True
+    if y < 0 or y >= N:
+        return True
+    if arr[y][x] != 0:
+        return True
+    return False
+
+T = int(input())
+for tc in range(1, T+1):
+    print('#{}'.format(tc))
+    N = int(input())
+    src = list(_ for _ in range(1, N**2 + 1))
+    arr = [[0] * N for _ in range(N)]
+    # print(src)
+    # 방향설정
+    dx = [1, 0, -1, 0]
+    dy = [0, 1, 0, -1]
+    dir = 0
+	# 시작점 설정
+    curX = curY = 0
+	
+    # src 에 이미 정렬된 값이 들어있으므로 따로 최소값과 최대값을 안구해도 된다.
+    for i in range(0, N**2):
+        arr[curY][curX] = src[i]
+        testX = curX + dx[dir]
+        testY = curY + dy[dir]
+        if isWall(testX, testY):
+            dir += 1
+            if dir == 4:
+                dir = 0
+        curX = curX + dx[dir]
+        curY = curY + dy[dir]
+
+    # print(arr)
+    for i in range(N):
+        for j in range(N):
+            print(arr[i][j], end=" ")
+        print()
+```
+
+
+
 ### D3
 
+- **swea_4615 (재미있는 오셀로 게임)**
 
+```python
+for tc in range(1, int(input())+1):
+    N, M = map(int, input().split())
+    arr = [[0] * N for _ in range(N)]
+    i = N // 2
+    j = i - 1
+    arr[i][i] = 2
+    arr[j][j] = 2
+    arr[i][j] = 1
+    arr[j][i] = 1
+
+    for i in range(M):
+        x, y, color = map(int, input().split())
+        # arr의 인덱스는 0부터 시작하니까 -1을 빼준다.
+        x = x - 1
+        y = y - 1
+        arr[y][x] = color
+        # 오른쪽, 왼쪽, 아래, 위, 대각선오른쪽아래, 대각선왼쪽아래, 대각선 오른쪽위, 대각선 왼쪽위
+        dx = [1, -1, 0, 0, 1, -1, 1, -1]
+        dy = [0, 0, 1, -1, 1, 1, -1, -1]
+        for d in range(8):
+            newX = x + dx[d]
+            newY = y + dy[d]
+            # 방향을 이동한 값(오른쪽으로 이동했다면 오른쪽으로 이동한 값)이 현재의 color와 같지 않다면,
+            # 현재의 color와 같은 값이 나올때까지 이동
+            while newX >= 0 and newY >= 0 and newX < N and newY < N and arr[newY][newX] != 0 and arr[newY][newX] != color:
+                newX += dx[d]
+                newY += dy[d]
+            # 쭉 이동하다가 color가 같은 값을 만났다면,
+            # 맨 처음 위치로 다시 되돌아오면서 값을 바꿔준다. ex) 1 2 2 1 -> 1 1 1 1
+            if newX >= 0 and newY >= 0 and newX < N and newY < N and arr[newY][newX] == color:
+                while newX >= 0 and newY >= 0 and newX < N and newY < N and x != newX or y != newY:
+                    newX -= dx[d]
+                    newY -= dy[d]
+                    arr[newY][newX] = color
+
+    cnt = 0
+    cnt1 = 0
+    for i in range(N):
+        for j in range(N):
+            if arr[i][j] == 1:
+                cnt += 1
+            if arr[i][j] == 2:
+                cnt1 += 1
+    print('#{} {} {}'.format(tc, cnt, cnt1))
+```
+
+#
+
+```python
+# donguk
+def check(r, c, k, color, idx):
+# 놓은자리 바둑돌색깔(color 값은 안바뀜)과 같은색깔 만나면 탈출
+    if 0<=r<N and 0<=c<N and brd[r][c]==color:
+# 지금까지 지나온 자리 바둑돌 뒤집어준다 내껄로
+        for i in range(1, idx+1):
+            brd[r - dr[k]*i][c - dc[k]*i] = color
+        return
+# 한칸 더 가도 상대팀바둑돌이면 1칸 추가해주고 재귀 ㄱㄱ
+    if 0<=r<N and 0<=c<N and brd[r][c]==3-color:
+        check(r + dr[k], c + dc[k], k, color, idx+1)
+
+dr = [-1,1,0,0, -1,-1,1,1]
+dc = [0,0,-1,1, -1,1,-1,1]
+
+T = int(input())
+for tc in range(1, T+1):
+    N, M = map(int, input().split())
+    brd = [[0]*N for _ in range(0, N)]
+
+# 기본위치 바둑돌
+    brd[N//2-1][N//2-1] = 2
+    brd[N//2][N//2] = 2
+    brd[N//2-1][N//2] = 1
+    brd[N//2][N//2-1] = 1
+
+    for i in range(0, M):
+        c, r, color = map(int, input().split())
+# 0,0부터 시작하기로 했으니 1빼주고넣음
+        brd[r-1][c-1] = color
+        for k in range(0, 8):
+            nr = r-1 + dr[k]
+            nc = c-1 + dc[k]
+# 놓는자리의 8방향중에서 인접한 곳이 다른색 바둑돌(3-1=2, 3-2=1)인 경우 함수 스타트
+            if 0<=nr<N and 0<=nc<N and brd[nr][nc]==3-color:
+                check(nr, nc, k, color, 0)
+
+    cnt_B = 0
+    cnt_W = 0
+    for r in range(0, N):
+        for c in range(0, N):
+            if brd[r][c]==1:
+                cnt_B += 1
+            elif brd[r][c]==2:
+                cnt_W += 1
+
+    print(f'#{tc} {cnt_B} {cnt_W}')
+```
 
 
 
@@ -489,160 +636,9 @@ for tc in range(1, T+1):
 
 ## Algorithm
 
-### 이론
-
-> **string**
-
-- **문자열 뒤집기 (연습문제 1)**
-
-  python은 reverse함수 혹은 silce notation을 이용하여 구현하면 된다.
-
-  string은 immutable이기 때문에 swap이 가능하지 않다.
-
-  그렇기때문에 string을 list로 변환해주어야 한다!
-
-  ```python
-  def word_reverse(word):
-      # str -> list
-      arr = list(word)
-      # swap
-      for i in range(len(arr)//2):
-         arr[i], arr[len(arr)-1-i] = arr[len(arr)-1-i], arr[i]
-      # list -> str
-      word = "".join(arr)
-      return word
-  
-  
-  word = 'algorithm'
-  word1 = word_reverse(word)
-  print(word1)
-  ```
-
-  ```python
-  # [::-1] 이용
-  word = 'algorithm'
-  print(word[::-1])
-  ```
-
-  ```python
-  # reverse() 이용
-  word = 'algorithm'
-  arr = list(word)
-  arr.reverse()
-  arr = "".join(arr)
-  print(arr)
-  ```
-
-
-
-- **문자열 비교 (string compare)**
-
-```python
-def strcmp(s1, s2):
-    if len(s1) != len(s2):
-        return False
-    else:
-        i = 0 # 초기식
-        while i < len(s1) and i < len(s2): # 조건식
-            if s1[i] != s2[i]:
-                return False
-            i += 1 # 증감식
-        return True
-
-a = 'abc'
-b = 'abc'
-print(strcmp(a, b)) # True, False
-```
-
-
-
-- **문자열 숫자를 정수로 변환 ( atoi() )** 
-
-```python
-def atoi(word):
-    value = 0
-    for i in range(len(word)):
-        c = word[i]
-        # 0 ~ 9
-        # if c >= '0' and c <= '9':
-        if '0' <= c <= '9':
-            # ord(c) = 49, ord('o') = 48
-            digit = ord(c) - ord('0')
-        else:
-            break
-            # value = 0 * 10 + 1 -> 1
-            # value = 1 * 10 + 2 -> 12
-            # value = 12 * 10 + 3 -> 123
-        value = value * 10 + digit
-    return value
-
-a = '123'
-print(type(a))
-b = atoi(a)
-print(type(b))
-```
-
-
-
-- **정수를 문자열로 변환 ( itoa() )** 
-
-```python
-def itoa(num):
-    x = num # 몫
-    y = 0  # 나머지가 들어갈 변수
-    arr = []
-    while x:
-        y = x % 10
-        x = x // 10
-        # arr = [3, 2, 1]
-        arr.append(chr(y + ord('0')))
-    # arr = [1, 2, 3]
-    arr.reverse()
-    # list -> str로 변환
-    str = ''.join(arr)
-    return str
-
-x = 123
-print(x, type(x))
-str = itoa(x)
-print(str, type(str))
-```
-
-
-
-- **패턴매칭**
-
-  - 고직식한 알고리즘(Brute Force): 본문 문자열을 처음부터 끝까지 차례대로 순회하면서 패턴 내의 문자들을 일일이 비교하는 방식으로 동작
-
-  ```python
-  def BruteForce(p, t):
-      i = 0
-      j = 0
-      while j < M and i < N:
-          if t[i] != p[j]:
-              i = i - j
-              j = -1
-          i = i + 1
-          j = j + 1
-      if j == M:
-          return i - M
-      else:
-          return -1
-  
-  p = 'is'
-  t = 'This is a book~!'
-  M = len(p)
-  N = len(t)
-  print(BruteForce(p, t))
-  ```
-
-  
-
-  
-
 ### Intermediate
 
-- **[S/W 문제해결 기본] 5일차 - GNS**
+- **[S/W 문제해결 기본] 5일차 (swea_1221) - GNS**
 
   ```python
   T = int(input())
@@ -717,7 +713,7 @@ print(str, type(str))
 
 
 
-- **[S/W 문제해결 기본] 3일차 - 회문**
+- **[S/W 문제해결 기본] 3일차(swea_1216) - 회문2**
 
 ```python
 '''
@@ -780,6 +776,34 @@ for tc in range(1, T+1):
     print(max_value)
 ```
 
+#
+
+```python
+T = 10
+for tc in range(1, T+1):
+    test_case = int(input())
+    str_table = list(input() for _ in range(100))
+    trans = list(zip(*str_table))
+
+    max_length = 1
+    for i in range(100):
+        # 회문의 길이 100부터 
+        for m in range(100, 1, -1):
+            for j in range(100-m+1):
+                if str_table[i][j:j+m] == str_table[i][j:j+m][::-1]:
+                    if max_length < len(str_table[i][j:j+m]):
+                        max_length = len(str_table[i][j:j+m])
+                        break
+    for i in range(100):
+        for m in range(100, 1, -1):
+            for j in range(100-m+1):
+                if trans[i][j:j+m] == trans[i][j:j+m][::-1]:
+                    if max_length < len(trans[i][j:j+m]):
+                        max_length = len(trans[i][j:j+m])
+                        break
+    print('#{} {}'.format(tc, max_length))
+```
+
 
 
 - **swea_4861 (회문)**
@@ -805,6 +829,7 @@ for tc in range(1, T+1):
             if arr[i][j:j+M] == arr[i][j:j+M][::-1]:
                 # 출력한다.
                 print(arr[i][j:j+M])
+    
     # 열 체크
     # 열 체크를 할 땐 슬라이싱을 사용할 수 없다.
     # 열을 그냥 새로운 리스트에 담아서 위와 같은 방법을 사용하자.
@@ -825,6 +850,136 @@ for tc in range(1, T+1):
             if colunm[i][j:j+M] == colunm[i][j:j+M][::-1]:
                 # 리스트이기때문에 str로 변환해서 출력해야 한다!
                 print("".join(colunm[i][j:j+M]))
+```
+
+
+
+#
+
+```python
+T = int(input())
+for tc in range(1, T + 1):
+    N, M = map(int, input().split())
+    arr = [[] for r in range(0, N)]
+    for r in range(0, N):
+        line = input()
+        for c in range(0, N):
+            arr[r].append(line[c])
+
+    print(f'#{tc}', end=' ')
+    # for문을 벗어나기 위한 변수
+    breaker = False
+    # 세로 회문 탐색
+    for r0 in range(0, N):
+        for c0 in range(0, N):
+            # 세로를 탐색하려면 세로의 시작점(r0)과 회문의 길이의 합이 table의 길이를 넘으면 안된다.
+            if r0 + M - 1 < N:
+                # 다음 열로 넘어가기 위한 변수
+                next = False
+                # 회문의 절반만 확인하면 되므로 M // 2만큼 반복을 돌고
+                for i in range(0, M // 2):
+                    # N = 10, M = 10이라고 예시를 든다면,
+                    # arr[0][0] 과 arr[9][0]가 같은지 비교
+                    # arr[1][0] 과 arr[8][0]가 같은지 비교
+                    # arr[2][0] 과 arr[7][0]가 같은지 비교
+                    # arr[3][0] 과 arr[6][0]가 같은지 비교
+                    # arr[4][0] 과 arr[5][0]가 같은지 비교
+                    # 같지 않다면,
+                    if arr[r0 + i][c0] != arr[r0 + M - 1 - i][c0]:
+                        # for문을 벗어나고, (i for문)
+                        next = True
+                        break
+                # c0 == 0 -> c0 ==1로 넘어가고
+                if next:
+                    continue
+                # 같다면 (회문이라면)
+                else:
+                    # 회문의 길이만큼 반복하여 출력한다
+                    for i in range(0, M):
+                        print(arr[r0 + i][c0], end='')
+                    print()
+                    # 회문이 1개라고 했으므로 출력을 했다면 전체 반복문을 벗어나자.
+                    breaker = True
+                    break
+
+            # 가로 회문 탐색
+            # 가로를 탐색하려면 가로의 시작점(c0)과 회문의 길이의 합이 table의 길이를 넘으면 안된다.
+            if c0 + M - 1 < N:
+                next = False
+                for i in range(0, M // 2):
+                    # N = 10, M = 10이라고 예시를 든다면,
+                    # arr[0][0] 과 arr[0][9]가 같은지 비교
+                    # arr[0][1] 과 arr[0][8]가 같은지 비교
+                    # arr[0][2] 과 arr[0][7]가 같은지 비교
+                    # arr[0][3] 과 arr[0][6]가 같은지 비교
+                    # arr[0][4] 과 arr[0][5]가 같은지 비교
+                    # 같지 않다면,
+                    if arr[r0][c0 + i] != arr[r0][c0 + M - 1 - i]:
+                        next = True
+                        break
+                if next:
+                    continue
+                else:
+                    for i in range(0, M):
+                        print(arr[r0][c0 + i], end='')
+                    print()
+                    breaker = True
+                    break
+        # 회문이 있다면 전체 for문 종료
+        if breaker:
+            break
+```
+
+#
+
+```python
+T = int(input())
+# 회문인지 체크하는 함수 : find
+def find(row, col):
+    found = True
+    ans = ""
+    # 가로축 검사
+    for i in range(M//2):
+        if S[row][col+i] == S[row][col+M-i-1]:
+            continue
+        else:
+            found = False
+            return
+    if found : # 넣은 row, col이 맞으면 출력까지 같이 하겠다.
+        for i in range(M):
+            ans += S[row][col+i]
+        print(ans)
+    return
+
+# 세로 찾는 함수
+def find2(row, col):
+    found = True
+    ans = ""
+    # 가로축 검사
+    for i in range(M//2):
+        if S[row+i][col] == S[row+M-i-1][col]:
+            continue
+        else:
+            found = False
+            return
+    if found : # 넣은 row, col이 맞으면 출력까지 같이 하겠다.
+        for i in range(M):
+            ans += S[row+i][col]
+        print(ans)
+    return
+
+for test_case in range(1, T+1):
+    # N : N X N 행렬, M : 길이가 M인 회문
+    N, M = map(int, input().split())
+    S = [input() for _ in range(N)]
+    print(f'#{test_case}', end=' ')
+    # 시작점 설정
+    for r in range(0, N):
+        for c in range(0, N):
+            if c+M <= N :
+                find(r,c)
+            if r+M <= N :
+                find2(r,c)
 ```
 
 
@@ -922,6 +1077,295 @@ for tc in  range(1, T+1):
 ```
 
 
+
+- **[S/W 문제해결 기본] 2일차 (swea_1210) - Ladder1**
+
+```python
+'''
+고려할 조건
+1. 2가 나온 지점이 시작점이 되고 위로 올라가면서 ladder[0][c] -> c 찾기
+2. 현재 위치에서 좌, 우에 1이 있는지 확인하기
+3. 이동할 때 벽인지
+'''
+T = 10
+for tc in range(1, T+1):
+    print('# {}'.format(tc), end=" ")
+    N = int(input())
+    ladder = [list(map(int, input().split())) for _ in range(100)]
+
+    # 고려할 조건 1번.
+    # 2는 무조건 마지막 줄에 있으므로 r을 99로 고정시켜둔다.
+    r = 99
+    # c를 담을 변수를 만든다.
+    c = 0
+    # 100 * 100 사다리니까 행이 99인 줄에서 100개의 값을 순회하며
+    for i in range(100):
+        # 값이 2인 것을 찾아내고 c에 담는다.
+        if ladder[r][i] == 2:
+            c = i
+    # -> 시작점은 ladder[r][c]가 된다.
+
+    # 고려할 조건 2번, 3번
+    while r >= 0:
+        # 현재값을 0으로 바꿔준다!
+        ladder[r][c] = 0
+        # 좌측에 1이 있는지 확인
+        # 열이 0 ~ 99 까지니까 좌측으로 갈수록 c-1이 되고 그 값이 0보다 작으면 안된다.
+        # 만약 ladder[r][c-1]이 1이라면 c에 1씩 빼주면서 좌측으로 이동한다.
+        if c-1 >= 0 and ladder[r][c-1] == 1:
+            c -= 1
+            # continue를 해주는 이유는 만일 ladder[r][c-1]값과 ladder[r][c+1] 모두 1이였을때,
+            # 어느 방향으로 갈지 길을 잃게 된다.
+            # 그래서 현재 있는 위치에서 좌 또는 우측으로 이동했을 때 이동하기 전의 값을 0으로 바꿔준다.
+            continue
+        # 우측에 1이 있는지 확인
+        # 열이 0 ~ 99 까지니까 우측으로 갈수록 c+1이 되고 그 값이 99보다 크면 안된다.
+        # 만약 ladder[r][c+1]이 1이라면 c에 1씩 더해주면서 우측으로 이동한다.
+        if c+1 <= 99 and ladder[r][c+1] == 1:
+            c += 1
+            continue
+        # 좌, 우측 모두 1이 없다면 위로 이동한다.
+        else:
+            r -= 1
+    print(c)
+```
+
+
+
+- **swea_4869 (종이붙이기)**
+
+![4869](README.assets/SWEA_4869.PNG)
+
+```python
+# 1 3 5 11 20.....
+# N = (N-2)*2 + (N-1)
+def f(n):
+    if n <= 1:
+        return 1
+    else:
+        return f(n-2)*2 + f(n-1)
+
+T = int(input())
+for tc in range(1, T+1):
+    print('#{}'.format(tc), end=" ")
+    N = int(input())
+    n = N // 10
+    print(f(n))
+```
+
+
+
+- **swea_4866 (괄호검사)**
+
+```python
+'''
+input을 순호하면서 '('과 '{'이면 stack에 push
+')'과 '}'이면 1. 스택이 비어 있지 않고 2. stack의 마지막 값이 짝이 맞다면 pop!
+stack이 비어있지 않으면 0을 리턴하고 비어있다면 1을 리턴
+'''
+
+T = int(input())
+for tc in range(1, T+1):
+    print('#{}'.format(tc), end=" ")
+    def check(arr):
+        stack = []
+        for i in arr:
+            # if i == '(' or c == '{':
+            # stack.append(i)
+            if i == '(':
+                stack.append(i)
+            elif i == '{':
+                stack.append(i)
+
+            elif i == ')':
+                if stack:
+                    if stack[-1] == '(':
+                        stack.pop(-1)
+                        continue
+                    if stack[-1] == '{':
+                        return 0
+                else:
+                    return 0
+            elif i == '}':
+                if stack:
+                    if stack[-1] == '{':
+                        stack.pop(-1)
+                        continue
+                    if stack[-1] == '(':
+                        return 0
+            else:
+                continue
+        if stack:
+            return 0
+        else:
+            return 1
+
+    arr = input()
+    print(check(arr))
+```
+
+
+
+- **swea_4871 (그래프 경로)**
+
+```python
+'''
+DFS를 구현하는데
+재귀를 사용하지않고 반복을 통한 방법
+출발 정점을 스택에 push하고 방문여부를 설정한다.
+스택에 값이 있다면 while반복을 통해 스택의 마지막 값을 pop하고
+pop한 값을 인접리스트의 인덱스로 접근하여 인접한 요소가 있는지 찾는다.
+인접 요소들을 하나씩 순회하며 방문여부를 확인하고 방문하지 않았던 요소라면,
+스택에 push해준다. push를 했다면 다시 while 처음으로 돌아가 반복한다.
+'''
+def dfs(v):
+    stack = []
+    stack.append(v)
+    visited[v] = 1
+    while stack:
+        v = stack.pop(-1)
+        lst.append(v)
+        # print(v, end=" ")
+        # if not visited[v]:
+        #     visited[w] = 1
+        for w in G[v]:
+            if not visited[w]:
+                visited[w] = 1
+                stack.append(w)
+                # dfs(w)
+    return lst
+
+T = int(input())
+for tc in range(1, T+1):
+    print('#{}'.format(tc), end=" ")
+    # 정점과 간선의 수를 입력받는다.
+    V, E =  map(int, input().split())
+    # 간선의 정보를 2차원 배열로 만들고
+    e = [list(map(int, input().split())) for _ in range(E)]
+    # 2차원 배열의 요소를 모두 담을 리스트를 만든다.
+    temp = []
+    # e를 전체 순회하면서 temp리스트에 담아준다.
+    for i in range(E):
+        for j in range(len(e[i])):
+            temp.append(e[i][j])
+    # ex) temp = [1, 4, 1, 3, 2, 3, 2, 5, 4, 6]
+    # 인접리스트를 초기화시킨다.
+    # ex) G[[], [], [], [], [], [], []]
+    # 범위가 V+1인 이유는 인접리스트에 V를 인덱스로 접근하기 위해서이다! (V는 1부터 시작하는데 인덱스는 0부터 시작하니까)
+    G = [[] for _ in range(V+1)]
+    for i in range(E):
+        # temp의 짝수번째 값은 G의 인덱스로 들어가고 -> (start)
+        # temp의 홀수번재 값은 G[짝수]의 값이 된다. -> (end)
+        # ex) G=[[], [4, 3], [3, 5], [6], [], []]
+        G[temp[2*i]].append(temp[2*i+1])
+    # 경로의 존재를 확인할 출발 노드와 도착 노드를 입력받는다.
+    S, g = map(int, input().split())
+    # 방문 여부를 확인할 리스트를 만들어주고(이 역시 V값을 인덱스로 접근하기위해 V+1개 만든다.)
+    visited = [0] * (V+1)
+    lst = []
+
+    # 입력받은 출발 노드에서 방문한 값들을 lst에 담았고 그 안에 입력받은 도착 노드가 있다면 경로가 있는 것이르모 1을 출력한다.
+    if g in dfs(S):
+        print(1)
+    else:
+        print(0)
+    print(lst)
+```
+
+=> 함수와 반복문의 짬뽕이였다 ㅎㅎ
+
+=> DFS의 3가지 방법을 공부하고 어떤 것을 적용할지 이해하자!
+
+
+
+- **swea_4873 (반목문자 지우기)**
+
+```python
+'''
+input값을 순회하면서 맨 처음 값은 stack에 push하고
+그 다음 값이 stack에 들어있는 값이라면 현재 stack에 들어있는 값을 pop하고
+아니라면 push한다.
+'''
+T = int(input())
+for tc in range(1, T+1):
+    print('#{}'.format(tc), end=" ")
+    def delete(s):
+        # 빈 stack을 만들어주고
+        stack = []
+        # input값을 순회하면서 한 글자씩 중복된 값인지 확인
+        for i in s:
+            # 맨 처음 값은 무조건 stack에 넣고
+            if len(stack) == 0:
+                stack.append(i)
+                continue
+            # 그 다음 값부터 stack에 들어있는 값과 중복된 값인지 확인.
+            # 연속된 값이 중복인지 확인해야하므로 stack의 맨 마지막값과 비교한다.
+            else:
+                # 글자가 stack의 맨 마지막값과 같다면
+                # stack의 마지막 값을 pop하고
+                if i == stack[-1]:
+                    stack.pop()
+                    continue
+
+                # 아니라면 stack에 push한다.
+                else:
+                    stack.append(i)
+                    continue
+        # stack이 비어있지않다면 stack의 길이를 리턴하고
+        if stack:
+            return len(stack)
+        # stack이 비어있다면 0을 리턴한다.
+        else:
+            return 0
+
+    s = input()
+    print(delete(s))
+```
+
+
+
+- **swea_1258 (행렬찾기)**
+
+```python
+# donguk
+# 행렬 세기
+T = int(input())
+for test_case in range(1, T+1) :
+    N = int(input())
+    arr = [list(map(int, input().split())) for r in range(0, N)]
+    cnt = 0 # 행렬의 갯수를 담는 변수
+    ans = [] # 답을 담을 변수
+    for r in range(0, N) :
+        for c in range(0, N) :
+            if arr[r][c] != 0 : # 행렬 안에 행렬 찾기, 만약 행렬 요소값이 있으면
+                cnt += 1    # 행열의 갯수
+                nr = r  # 배열의 첫번째행 값을 담음
+                while True : # sub 행렬의 마지막 행값을 찾기 위한 반복문
+                    nr +=1
+                    if nr<0 or nr >= N or arr[nr][c] == 0 : # 만약 인덱스 범위를 넘어가거나 행의 끝을 넘어가면 반복문 종료
+                        break
+                nc = c # 첫번째 열값 저장
+                while True : # sub 행렬의 마지막 열값을 찾기 위한 반복문
+                    nc += 1 # 마지막 열을 찾음
+                    if nc < 0 or nc >= N or arr[r][nc] == 0 : # 만약 인덱스 범위르 넘어가거나 열의 끝을 넘어가면 반복문 종료
+                        break
+
+                for x in range(r, nr) : # 지나갔던 sub행렬이 값을 0으로 초기화시켜 없애주고 sub행렬의 행,열의 크기는 ans리스트에 저장
+                    for y in range(c, nc) :
+                        arr[x][y] = 0
+                ans.append((nr-r, nc-c))
+
+    for i in range(0, cnt) : # cnt = 행렬의 갯수
+        min_i = i
+        for j in range(i+1, cnt):
+            if ans[min_i][0]*ans[min_i][1] > ans[j][0] * ans[j][1] : # 행렬의 크기가 더 작은 값이 앞으로 가게
+                min_i = j
+        ans[min_i], ans[i] = ans[i], ans[min_i]
+    print(f'#{test_case} {cnt}', end = ' ')
+    for r, c in ans :
+        print(f'{r} {c}', end = ' ')
+    print()
+```
 
 
 
